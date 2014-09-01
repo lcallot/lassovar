@@ -7,12 +7,18 @@ The package is used in [*Oracle inequalities for high dimensional vector autoreg
 and [*Oracle Efficient estimation and Forecasting with the Adaptive Lasso and the Adaptive Group Lasso in Vector Autoregressions.*](http://lcallot.github.io/papers/oracle-forecasting).
 
 
+Disclaimer
+---------
+This package is a work in progress.
+
 
 Usage
 --------
 
 * The function `lassovar` provides for the estimation of Vector Autoregressions with the Lasso,
 or adaptive Lasso using either the Lasso, OLS, or ridge regressions as the initial estimator.
-The penalty parameter is chosen using an information criterion (BIC or AIC). 
+The penalty parameter is chosen using an information criterion (BIC or AIC). A post-Lasso OLS can also be estimated.  
 
 * `forecast.lassovar` is used to forecast (!) either directly or recursively. 
+
+* `summary` and `predict` methods are provided. 
