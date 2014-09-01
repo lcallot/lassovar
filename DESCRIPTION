@@ -11,6 +11,7 @@ Depends:
     SGL,
     grpreg,
     Matrix,
+    dyplr,
     biglm
 Description: Estimate Vector Autoregression using Lasso-type estimators
 License: GPL (>= 2)
