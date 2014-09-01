@@ -1,0 +1,52 @@
+\name{lassovar}
+\alias{lassovar}
+\title{Estimates a Vector Autoregressive model by mean of Lasso or adaptive Lasso}
+\usage{
+lassovar(dat, lags = 1, ...)
+}
+\arguments{
+  \item{dat}{a data.frame containing the series.}
+
+  \item{lags}{the number of consecutive lags in the model.}
+
+  \item{ic}{Optional, the information criterion to use for
+  selecting the penalty parameter. Default to BIC.}
+
+  \item{ada}{Optional, initial estimator for the adaptive
+  Lasso. Can be chosen between ols, lasso, ridge.}
+
+  \item{rest}{Optional, prespecified restrictions on the
+  design matrix. Can take values in 'none', 'ar' for
+  autoregressive models, and 'covrest' for covariance-style
+  restrictions.}
+
+  \item{exo}{Optional, a data frame of same length as dat
+  containing exogenous variables.}
+
+  \item{mc}{Optional, default to FALSE. Should the
+  equation-by-equation estimation be parallelized using
+  multicore?}
+
+  \item{ncores}{Optional, the number of cores to use in
+  case of parallelization.}
+
+  \item{dfmax}{Optional, the maximum number of variables in
+  the model excluding the intercept. An option of glmnet,
+  it exits the algorithm when the penalty is small enough
+  that more than dmax variables are included in the model.
+  Incresease the speed tremendously for large VARs.}
+}
+\value{
+A lassovar object.
+}
+\description{
+Estimates a Vector Autoregressive model by mean of Lasso or
+adaptive Lasso
+}
+\examples{
+\dontrun{
+dat <- data.frame(matrix(rnorm(1000,ncol=10)))
+lv.mod <- lassovar(dat)
+}
+}
+

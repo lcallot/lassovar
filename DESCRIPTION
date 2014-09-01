@@ -1,0 +1,16 @@
+Package: lassovar
+Type: Package
+Title: Estimate Vector Autoregression using Lasso-type estimators
+Version: 0.4
+Date: 2013-06-10
+Author: Laurent Callot
+Maintainer: Laurent Callot <l.callot@vu.nl>
+Depends:
+    multicore,
+    glmnet,
+    SGL,
+    grpreg,
+    Matrix,
+    biglm
+Description: Estimate Vector Autoregression using Lasso-type estimators
+License: GPL (>= 2)
