@@ -2,6 +2,9 @@ lassovar
 ========
 
 Estimation and forecasting of VAR model with the Lasso.
+
+[![Build Status](https://travis-ci.org/lcallot/lassovar.png?branch=master)](https://travis-ci.org/lcallot/lassovar)
+
 This package is a wrapper for the _glmnet_ package aimed at facilitating estimation and forecasting with VAR models.
 The package is used in [*Oracle inequalities for high dimensional vector autoregressions*](http://lcallot.github.io/papers/oracle-var)
 and [*Oracle Efficient estimation and Forecasting with the Adaptive Lasso and the Adaptive Group Lasso in Vector Autoregressions.*](http://lcallot.github.io/papers/oracle-forecasting)
