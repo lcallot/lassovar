@@ -4,10 +4,10 @@
 #' @param lags the number of consecutive lags in the model. 
 #'
 #' @param ic Optional, the information criterion to use for selecting the penalty parameter. Default to BIC.
-#' @param ada Optional, initial estimator for the adaptive Lasso. Can be chosen between ols, lasso, ridge. 
+#' @param adaptive Optional, initial estimator for the adaptive Lasso. Can be chosen between ols, lasso, ridge. 
 #' @param rest Optional, prespecified restrictions on the design matrix. Can take values in 'none', 'ar' for autoregressive models, and 'covrest' for covariance-style restrictions. 
 #' @param exo Optional, a data frame of same length as dat containing exogenous variables.   
-#' @param mc Optional, default to FALSE. Should the equation-by-equation estimation be parallelized using multicore?
+#' @param mc Optional, default to FALSE. Should the equation-by-equation estimation be parallelized using mclapply from the parallel package?
 #' @param ncores Optional, the number of cores to use in case of parallelization.
 #' @param dfmax Optional, the maximum number of variables in the model excluding the intercept. An option of glmnet, it exits the algorithm when the penalty is small enough that more than dmax variables are included in the model. Incresease the speed tremendously for large VARs.
 #'
@@ -18,6 +18,7 @@
 #' \dontrun{
 #' dat <- data.frame(matrix(rnorm(1000,ncol=10)))
 #' lv.mod <- lassovar(dat)
+#' lv.mod.ada <- lassovar(dat,adaptive ='ols')
 #' }
 #'
 #' @export
