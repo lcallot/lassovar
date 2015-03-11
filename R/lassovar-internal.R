@@ -159,7 +159,7 @@ function(data.var,lags,horizon,exo=NULL)
 	varnx <- NULL
 	for(l in 1:lags)
 		{
-		x	<-cbind(x,apply(data.var,2,dplyr::lag,n=l+horizon-1))
+		x	<-cbind(x,apply(data.var,2,lag,n=l+horizon-1))
 		varnx<-c(varnx,paste(l,'L_',varny,sep=''))
 		}
 	colnames(x) <- varnx
