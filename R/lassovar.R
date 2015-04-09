@@ -10,6 +10,7 @@
 #' @param mc Optional, default to FALSE. Should the equation-by-equation estimation be parallelized using mclapply from the parallel package?
 #' @param ncores Optional, the number of cores to use in case of parallelization.
 #' @param dfmax Optional, the maximum number of variables in the model excluding the intercept. An option of glmnet, it exits the algorithm when the penalty is small enough that more than dmax variables are included in the model. Incresease the speed tremendously for large VARs.
+#' @param post Optional, Should a post Lasso OLS be estimated, default FALSE.
 #'
 #'
 #' @return A lassovar object.
