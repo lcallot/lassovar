@@ -6,10 +6,9 @@ function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,...)
 {
 
 	# begining of the training sample
-	if(fc.window=='fix')start.train	<- 1+fc
-	else start.train	<-1
+	start.train	<- 1+ifelse(fc.window=='fix',fc,0)
 	# end of the training sample.
-	end.train	<-start.train + ntrain - 1
+	end.train	<- start.train + ntrain - 1 + ifelse(fc.window=='expanding',fc,0)
 	
 	# The training data
 	train.dat <- dat[start.train:end.train,]
