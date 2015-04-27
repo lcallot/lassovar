@@ -44,7 +44,7 @@ lassovar<-function(dat,lags=1,...)
 	# restrictions ?
 	if(!is.null(argList$rest))rest<-argList$rest	else rest	<-'none'
 	# ??	
-	if(!is.null(argList$dfmax))dfmax<-argList$dfmax	else dfmax	<-ncol(dat)+1
+	if(!is.null(argList$dfmax))dfmax<-argList$dfmax	else dfmax	<-nrow(dat)-1
 
 	y.var	<-.mkvar(dat,lags=lags,horizon=1,exo=exo)	
 	

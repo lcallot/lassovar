@@ -97,7 +97,6 @@ function(y,x,ada,rest,mc,ncores)
   	if(mc)	ols.b	<-mclapply(1:ncol(y),.ar.ols,y,x,mc.cores=ncores)
 	}
   
-	browser()
 	
 	
 	ols.b	<- do.call(cbind,ols.b)

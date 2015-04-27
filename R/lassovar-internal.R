@@ -5,8 +5,7 @@ function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,rest,alpha=1,dfmax)
 {
 	lasso.eq	<-list('call'=match.call(),'eq'=TRUE,'var.names'=colnames(y),'ada.w'=ada.w,'x'=x,'y'=y,'coefficients'=NULL,'RSS'=NULL,'lambda'=NULL,'spectest'=NULL)	
 	all.ic		<-list()
-	
-	
+
 	
 	#Estimation with and w/o multicore
 	if(!mc){for(i in 1:ncol(y)){ all.ic[[i]]	<-.lv.eq.gn(i,y,x,ada.w,rest,ic=ic,alpha=alpha,dfmax=dfmax)}}
@@ -63,6 +62,7 @@ return(lasso.eq)
 	
   # Plain lasso
 	if(is.null(ada.w)){
+		browser()
 		gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=all.excl,alpha=alpha,dfmax=dfmax,standardize=TRUE,type.gaussian='covariance')}
 	
 	# In case of adaptive lasso
