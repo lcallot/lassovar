@@ -62,7 +62,6 @@ return(lasso.eq)
 	
   # Plain lasso
 	if(is.null(ada.w)){
-		browser()
 		gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=all.excl,alpha=alpha,dfmax=dfmax,standardize=TRUE,type.gaussian='covariance')}
 	
 	# In case of adaptive lasso
