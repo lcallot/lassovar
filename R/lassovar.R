@@ -27,7 +27,7 @@ lassovar<-function(dat,lags=1,...)
 {
 	argList	<- list(...)
 	
-	if(!(is.double(lags)&lags>0))stop('something wrong with the lag argument, an integer greater than zero would be appreciated')
+	if(!( (is.double(lags)|is.integer(lags))&lags>0))stop('something wrong with the lag argument, an integer greater than zero would be appreciated')
 
 	# Checking if dat is a data frame or coercing to it.
 	if(!is.data.frame(dat)) dat<-as.data.frame(dat)

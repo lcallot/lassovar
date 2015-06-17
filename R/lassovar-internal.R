@@ -1,3 +1,9 @@
+#' @importFrom glmnet glmnet
+#' @importFrom Matrix Matrix
+#' @importFrom parallel mclapply
+#' @importFrom plyr aaply
+
+
 
 # The workhorse, fits a lasso possibly adaptive given weights ada.w and selects the best model according both information criteria. 
 .lassovar.eq <-
@@ -164,7 +170,7 @@ function(data.var,lags,horizon,exo=NULL)
 	colnames(x) <- varnx
 	
 	# Exo variables
-	if(!is.null(exo)){	x<-cbind(x,t(aaply(exo,2,dplyr::lag,k=1)))}
+	if(!is.null(exo)){	x<-cbind(x,t(aaply(exo,2,lag,k=1)))}
 
 	# Trimming  and x
 	y <- tail(y,-(lags+horizon-1))
