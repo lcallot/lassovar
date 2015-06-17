@@ -15,7 +15,7 @@ The package is used in:
 
 Disclaimer
 ---------
-This package is a work in progress. DESCRIPTION and NAMESPACE need cleaning, the examples as well. 
+This package is a work in progress.
 
 
 Usage
