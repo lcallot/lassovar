@@ -27,4 +27,4 @@ The penalty parameter is chosen using an information criterion (BIC or AIC). A p
 
 * `forecast.lassovar` is used to forecast (!) either directly or recursively. 
 
-* `summary` and `predict` methods are provided. 
+* `summary`, `residuals`, and `predict` methods are provided. 
