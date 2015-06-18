@@ -1,7 +1,6 @@
 #' @importFrom glmnet glmnet
 #' @importFrom Matrix Matrix
 #' @importFrom parallel mclapply
-#' @importFrom plyr aaply
 
 
 

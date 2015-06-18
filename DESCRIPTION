@@ -16,6 +16,5 @@ Imports:
     glmnet,
     grpreg,
     Matrix,
-    plyr,
     biglm
 Suggests: testthat
