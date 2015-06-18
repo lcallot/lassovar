@@ -10,6 +10,8 @@
 \item{object}{A lassovar object.}
 
 \item{fc.data}{A data frame with the new data.}
+
+\item{...}{unused}
 }
 \description{
 predict.lassovar

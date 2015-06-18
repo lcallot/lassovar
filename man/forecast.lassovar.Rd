@@ -22,6 +22,8 @@ forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
 \item{ic}{Information criterion used to select the penalty parameter: BIC or AIC.}
 
 \item{mc}{Parallelize the forecasts with the multicore package. If you want to parallelize the equation-by-equation esitmation of the lasso var, set mc=FALSE and mclas=TRUE. In both cases, use the optional parameter ncores to select the numbers of cores to use.}
+
+\item{...}{Optional options...}
 }
 \description{
 Multiple forecasts a VAR using the Lasso or adaptive lasso.

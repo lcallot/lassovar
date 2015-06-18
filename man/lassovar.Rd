@@ -4,20 +4,22 @@
 \alias{lassovar}
 \title{Estimates a Vector Autoregressive model by mean of Lasso or adaptive Lasso}
 \usage{
-lassovar(dat, lags = 1, ...)
+lassovar(dat, exo = NULL, lags = 1, ic = c("BIC", "AIC"),
+  adaptive = c("none", "ols", "lasso", "group", "ridge"), post = FALSE,
+  mc = FALSE, ncores = NULL, dfmax = NULL, ...)
 }
 \arguments{
 \item{dat}{a data.frame containing the series.}
+
+\item{exo}{Optional, a data frame of same length as dat containing exogenous variables.}
 
 \item{lags}{the number of consecutive lags in the model.}
 
 \item{ic}{Optional, the information criterion to use for selecting the penalty parameter. Default to BIC.}
 
-\item{adaptive}{Optional, initial estimator for the adaptive Lasso. Can be chosen between ols, lasso, ridge.}
+\item{adaptive}{Optional, initial estimator for the adaptive Lasso. Can be chosen between: none (default, plain Lasso), ols, lasso, ridge.}
 
-\item{rest}{Optional, prespecified restrictions on the design matrix. Can take values in 'none', 'ar' for autoregressive models, and 'covrest' for covariance-style restrictions.}
-
-\item{exo}{Optional, a data frame of same length as dat containing exogenous variables.}
+\item{post}{Optional, Should a post Lasso OLS be estimated, default FALSE.}
 
 \item{mc}{Optional, default to FALSE. Should the equation-by-equation estimation be parallelized using mclapply from the parallel package?}
 
@@ -25,7 +27,7 @@ lassovar(dat, lags = 1, ...)
 
 \item{dfmax}{Optional, the maximum number of variables in the model excluding the intercept. An option of glmnet, it exits the algorithm when the penalty is small enough that more than dmax variables are included in the model. Incresease the speed tremendously for large VARs.}
 
-\item{post}{Optional, Should a post Lasso OLS be estimated, default FALSE.}
+\item{...}{Optional options...}
 }
 \value{
 A lassovar object.
@@ -35,9 +37,9 @@ Estimates a Vector Autoregressive model by mean of Lasso or adaptive Lasso
 }
 \examples{
 \dontrun{
-dat <- data.frame(matrix(rnorm(1000,ncol=10)))
-lv.mod <- lassovar(dat)
-lv.mod.ada <- lassovar(dat,adaptive ='ols')
+dat <- data.frame(matrix(rnorm(100),ncol=5))
+lv.mod <- lassovar(dat,lags=1)
+lv.mod.ada <- lassovar(dat,lags=1,adaptive ='ols')
 }
 }
 
