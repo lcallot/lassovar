@@ -147,38 +147,41 @@ return(lasso.ic)
 }
 
 
-
 .mkvar <-
-function(data.var,lags,horizon,exo=NULL)
-{
-	nbrser	<-ncol(data.var)
-	
-	# The dependent variable
-	y	<-data.var
-	if(!is.null(colnames(data.var)))varny<-colnames(data.var)
-	if(is.null(colnames(data.var)))	varny<-paste('Eq_',1:nbrser,sep='')
-	colnames(y)<-varny
-	
-	# The lags 
-	x <- NULL
-	varnx <- NULL
-	for(l in 1:lags)
+	function(data.var,lags,horizon,exo=NULL)
+	{
+		nbrser	<-ncol(data.var)
+		
+		# The dependent variable
+		y	<-data.var
+		if(!is.null(colnames(data.var)))varny<-colnames(data.var)
+		if(is.null(colnames(data.var)))	varny<-paste('Eq_',1:nbrser,sep='')
+		colnames(y)<-varny
+		
+		# The lags 
+		x <- NULL
+		varnx <- NULL
+		for(l in 1:lags)
 		{
-		x	<-cbind(x,apply(data.var,2,lag,n=l+horizon-1))
-		varnx<-c(varnx,paste(l,'L_',varny,sep=''))
+			x	<-cbind(x,
+					  rbind(matrix(NA,ncol=ncol(y),nrow=l+horizon-1),
+					  	  head(data.var,-(l+horizon-1))))
+			varnx<-c(varnx,paste(l,'L_',varny,sep=''))
 		}
-	colnames(x) <- varnx
-	
-	# Exo variables
-	if(!is.null(exo)){	x<-cbind(x,t(aaply(exo,2,lag,k=1)))}
-
-	# Trimming  and x
-	y <- tail(y,-(lags+horizon-1))
-	x <- tail(x,-(lags+horizon-1))
-
-	y.var<-list('y'=y,'x'=x,'lags'=lags,'horizon'=horizon,'nbrser'=nbrser)
-	return(y.var)
-}
+		colnames(x) <- varnx
+		
+		# Exo variables
+		#if(!is.null(exo)){	x<-cbind(x,t(aaply(exo,2,lag,k=1)))}
+		if(!is.null(exo)){	x<-cbind(x,exo)}
+		
+		
+		# Trimming  and x
+		y <- tail(y,-(lags+horizon-1))
+		x <- tail(x,-(lags+horizon-1))
+		
+		y.var<-list('y'=y,'x'=x,'lags'=lags,'horizon'=horizon,'nbrser'=nbrser)
+		return(y.var)
+	}
 
 
 
