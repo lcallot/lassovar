@@ -7,15 +7,15 @@
 
 # The workhorse, fits a lasso possibly adaptive given weights ada.w and selects the best model according both information criteria. 
 .lassovar.eq <-
-function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,rest,alpha=1,dfmax)
+function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,alpha=1,dfmax)
 {
 	lasso.eq	<-list('call'=match.call(),'eq'=TRUE,'var.names'=colnames(y),'ada.w'=ada.w,'x'=x,'y'=y,'coefficients'=NULL,'RSS'=NULL,'lambda'=NULL,'spectest'=NULL)	
 	all.ic		<-list()
 
 	
 	#Estimation with and w/o multicore
-	if(!mc){for(i in 1:ncol(y)){ all.ic[[i]]	<-.lv.eq.gn(i,y,x,ada.w,rest,ic=ic,alpha=alpha,dfmax=dfmax)}}
-	if(mc){	all.ic<-mclapply(1:ncol(y),.lv.eq.gn,y,x,ada.w,rest=rest,ic=ic,alpha=alpha,dfmax=dfmax,mc.cores=ncores)}
+	if(!mc){for(i in 1:ncol(y)){ all.ic[[i]]	<-.lv.eq.gn(i,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax)}}
+	if(mc){	all.ic<-mclapply(1:ncol(y),.lv.eq.gn,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,mc.cores=ncores)}
 
 
 	#Sorting out the IC results
@@ -40,31 +40,12 @@ return(lasso.eq)
 
 
 # Core function. Estimation of the Lasso and model selection.
-.lv.eq.gn<-function(i,y,x,ada.w,rest,ic,alpha,dfmax)
+.lv.eq.gn<-function(i,y,x,ada.w,ic,alpha,dfmax)
 {
 
 	
 # Computing exclusion vectors.	
 	all.excl<-NULL
-	if(rest=='covrest')	#Computing the index vector of variables to exclude:
-		{cov.keep <-.cov.keep(i,nbr.stock)	
-		cov.excl <-setdiff(1:ncol(y),cov.keep)
-		all.excl <-cov.excl
-		all.keep <-cov.keep
-		if(ncol(x)>ncol(y)){
-			for(l in 2:(ncol(x)/ncol(y))){
-				all.excl<-c(all.excl,cov.excl+(l-1)*ncol(y))
-				all.keep<-c(all.keep,cov.keep+(l-1)*ncol(y))
-				}
-			}
-		}
-  
-	if(rest=='ar')
-		{lags <- ncol(x)/ncol(y)
-	    # ar restrictions
-	    cov.keep <- (0:(lags-1))*ncol(y) + i
-	    all.excl <- setdiff(1:ncol(x),cov.keep)
-		}
 	
   # Plain lasso
 	if(is.null(ada.w)){
@@ -96,26 +77,6 @@ return(lasso.eq)
 	lv.ic$nbreq	<-ncol(y)
 
 	return(lv.ic)	
-}
-
-
-
-
-# This function sucks a bit...
-
-#Returns the indices of the variables to be excluded in equation i
-.cov.keep<- function(i,N)
-{
-	ind.mat	<-matrix(NA,N,N)
-	ind.mat[upper.tri(ind.mat,diag=TRUE)]<-1:(N*(N+1)/2)
-	x	<-ind.mat[upper.tri(ind.mat)]
-	ind.mat	<-t(ind.mat)
-	ind.mat[upper.tri(ind.mat,diag=FALSE)]<-x
-
-	if(i%in%diag(ind.mat))incl<-unique(c(ind.mat[which(ind.mat==i,arr.ind=TRUE)[,1],],diag(ind.mat)))
-	else incl<-unique(c(ind.mat[which(ind.mat==i,arr.ind=TRUE)[,1],],diag(ind.mat)))
-
-	return(incl)
 }
 
 
@@ -161,18 +122,16 @@ return(lasso.ic)
 		# The lags 
 		x <- NULL
 		varnx <- NULL
-		for(l in 1:lags)
-		{
-			x	<-cbind(x,
-					  rbind(matrix(NA,ncol=ncol(y),nrow=l+horizon-1),
-					  	  head(data.var,-(l+horizon-1))))
-			varnx<-c(varnx,paste(l,'L_',varny,sep=''))
+		for(l in 1:lags){
+			x <- cbind(x,rbind(matrix(NA,ncol=ncol(y),nrow=l+horizon-1),
+					  	  as.matrix(head(data.var,-(l+horizon-1)))))
+			varnx <- c(varnx,paste(l,'L_',varny,sep=''))
 		}
 		colnames(x) <- varnx
 		
 		# Exo variables
 		#if(!is.null(exo)){	x<-cbind(x,t(aaply(exo,2,lag,k=1)))}
-		if(!is.null(exo)){	x<-cbind(x,exo)}
+		if(!is.null(exo)){	x<-cbind(x,as.matrix(exo))}
 		
 		
 		# Trimming  and x

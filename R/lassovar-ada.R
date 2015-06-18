@@ -4,7 +4,7 @@
 
 
 # Group lasso adaptive weights
-# Deprecated
+# Mostly Deprecated
 .ada.grp.weights <-
 function(y,x,ada)
 {
@@ -46,63 +46,16 @@ function(y,x,ada)
 }
 
 
-# OLS with the covariance restrictions
-.covrest.ols<-function(i,x,y){
-  ols.b<-matrix(0,nrow=ncol(x)+1,ncol=1)
-  cov.keep <-.cov.keep(i,nbr.stock)	
-  cov.excl <-setdiff(1:ncol(y),cov.keep)
-  all.excl <-cov.excl
-  all.keep <-cov.keep
-  if(ncol(x)>ncol(y)){
-    for(l in 2:(ncol(x)/ncol(y))){
-      all.excl<-c(all.excl,cov.excl+(l-1)*ncol(y))
-      all.keep<-c(all.keep,cov.keep+(l-1)*ncol(y))
-    }
-  }
-  ols.b[c(1,1+all.keep),1]	<-lm(y[,i]~x[,-c(all.excl)])$coefficient
-  
-  return(ols.b)
-}
-
-# OLS imposing an autoregressive structure.
-.ar.ols<-function(i,x,y){
-	ols.b<-matrix(0,nrow=ncol(x)+1,ncol=1)
-  lags <- ncol(x)/ncol(y)
-  # ar restrictions
-  cov.keep <- (0:(lags-1))*ncol(y) + i
-
-  dat <- data.frame(y=y[,i],x=x[,cov.keep])
-  fmla <- as.formula(paste("y ~ ", paste(colnames(dat)[-1], collapse= "+")))
-	ols.b[c(1,1+cov.keep),1]	<-coef(biglm(fmla,data=dat))
-rm(dat)
-	return(ols.b)
-}
-
-
-
 
 
 .ada.ols.weights <-
-function(y,x,ada,rest,mc,ncores)
+function(y,x,ada,mc,ncores)
 {
 	ada.w	<-list('ada'=ada)
 	gamma	<-1
 
-	if(rest=='none')
-    {if(!mc)	ols.b	<-lapply(1:ncol(y),function(i,y,x){lm(y[,i]~x)$coefficients},y,x)
-	  if(mc)	ols.b	<-mclapply(1:ncol(y),function(i,y,x){lm(y[,i]~x)$coefficients},y,x,mc.cores=ncores)
-	}
-	if(rest=='covrest'){
-    if(!mc)	ols.b	<-lapply(1:ncol(y),.covrest.ols,y,x)
-  	if(mc)	ols.b	<-mclapply(1:ncol(y),.covrest.ols,y,x,mc.cores=ncores)
-	}
-
-	if(rest=='ar'){
-    if(!mc)	ols.b	<-lapply(1:ncol(y),.ar.ols,y,x)
-  	if(mc)	ols.b	<-mclapply(1:ncol(y),.ar.ols,y,x,mc.cores=ncores)
-	}
-  
-	
+    if(!mc)	ols.b	<-lapply(1:ncol(y),function(i,y,x){lm(y[,i]~x)$coefficients},y,x)
+    if(mc)	ols.b	<-mclapply(1:ncol(y),function(i,y,x){lm(y[,i]~x)$coefficients},y,x,mc.cores=ncores)
 	
 	ols.b	<- do.call(cbind,ols.b)
 
@@ -117,13 +70,13 @@ function(y,x,ada,rest,mc,ncores)
 
 
 # Lasso adaptive weights using the parameters from Lassovar
-.ada.las.weights<-function(y,x,ada,ic='BIC',mc=NULL,ncores,rest,dfmax)
+.ada.las.weights<-function(y,x,ada,ic='BIC',mc=NULL,ncores,dfmax)
 {
 	ada.w	<-list('ada'=ada)
 	gamma	<-1
 	if(is.null(mc))mc<-FALSE
 
-	lv.las	<-.lassovar.eq(y=y,x=x,degf.type=NULL,ada.w=NULL,ic=ic,mc=mc,ncores=ncores,rest=rest,alpha=1,dfmax=dfmax)
+	lv.las	<-.lassovar.eq(y=y,x=x,degf.type=NULL,ada.w=NULL,ic=ic,mc=mc,ncores=ncores,alpha=1,dfmax=dfmax)
 	
 	ada.w$b	<-lv.las$coefficients
 	ada.w$w	<-abs(lv.las$coefficients[-1,])^(-gamma)
@@ -136,13 +89,13 @@ function(y,x,ada,rest,mc,ncores)
 
 
 # Ridge regression for adaptive weights. 
-.ada.ridge.weights<-function(y,x,ada,ic='BIC',mc=NULL,ncores,rest,dfmax)
+.ada.ridge.weights<-function(y,x,ada,ic='BIC',mc=NULL,ncores,dfmax)
 {
 	ada.w	<-list('ada'=ada)
 	gamma	<-1
 	if(is.null(mc))mc<-FALSE
 
-	lv.las	<-.lassovar.eq(y=y,x=x,degf.type=NULL,ada.w=NULL,ic=ic,mc=mc,ncores=ncores,rest=rest,alpha=0,dfmax=dfmax)
+	lv.las	<-.lassovar.eq(y=y,x=x,degf.type=NULL,ada.w=NULL,ic=ic,mc=mc,ncores=ncores,alpha=0,dfmax=dfmax)
 	
 	ada.w$b	<-lv.las$coefficients
 	ada.w$w	<-abs(ada.w$b[-1,])^(-gamma)

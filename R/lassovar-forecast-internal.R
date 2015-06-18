@@ -1,5 +1,6 @@
 # This file contains the two functions called by mclapply in forecast.lassovar.
-
+# 
+# 
 # This function subsets the data into training sample and 'true' value of the forecast, calls the next.
 .fc.loop.lassovar <-
 function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,...)
@@ -37,7 +38,7 @@ function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,...)
 	
 	y.var		<-.mkvar(train.dat,lags,horizon,exo)
 	
-	las.mod		<-lassovar(dat=train.dat,horizon=horizon,lags=lags,ic=ic,exo=exo,rest=rest,mc=mclas,ncores=ncores,post=post,adaptive=adaptive)
+	las.mod		<-lassovar(dat=train.dat,horizon=horizon,lags=lags,ic=ic,exo=exo,mc=mclas,ncores=ncores,post=post,adaptive=adaptive)
 
 	lv		<-list()
 	

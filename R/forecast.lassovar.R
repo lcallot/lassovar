@@ -1,5 +1,6 @@
 #' Multiple forecasts a VAR using the Lasso or adaptive lasso.
 #'
+#' @importFrom parallel mclapply
 #'
 #' @param dat A data.frame.
 #' @param ntrain The number of training observations to use.
@@ -8,6 +9,7 @@
 #' @param fc.type Should the forecasts be recursive or direct?
 #' @param ic Information criterion used to select the penalty parameter: BIC or AIC.
 #' @param mc Parallelize the forecasts with the multicore package. If you want to parallelize the equation-by-equation esitmation of the lasso var, set mc=FALSE and mclas=TRUE. In both cases, use the optional parameter ncores to select the numbers of cores to use.
+#' @param ... Optional options...
 #'
 #' @export
 forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),fc.type=c('recursive','direct'),ic=c('BIC','AIC'),mc=FALSE,... )
@@ -28,14 +30,8 @@ forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),
 	if(!is.null(argList$adaptive)) argList$adaptive <- match.arg(argList$adaptive,choices=c('ols','lasso','ridge','group'))
 
 	exo		<-argList$exo
-	rest	<-argList$rest
 	ncores	<-argList$ncores
 
-# restrictions	
-	if(is.null(rest))rest<-'none'
-	rest <- match.arg(rest,c('none','ar','covrest'))
-	argList$rest <- rest
-	
 # Storage init
 	fc.lv	<-list('call'=match.call(),'err'=NULL,'coefficients'=NULL,'lambda'=NULL,'pred'=NULL)	
 
@@ -65,13 +61,13 @@ forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),
                              ,dat,ntrain,fc.window,lags
                              ,horizon,ic,exo=exo
 							 ,adaptive=argList$adaptive
-                             ,rest=rest,post=post)
+                             ,post=post)
 
 	if(mc)fc.lassovar<-mclapply(0:(nbr.fc-horizon),.fc.loop.lassovar
                               ,dat,ntrain,fc.window,lags
                               ,horizon,ic,mc.cores=ncores,exo=exo
 							  ,adaptive=argList$adaptive
-                              ,rest=rest,post=post)
+                              ,post=post)
 	
 
 	fc.lv$coefficients<-list()

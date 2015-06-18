@@ -1,15 +1,15 @@
-summary.lassovar<-function(object,...)
-{
+#' The summary method of class lassovar.
+#' 
+#' @param object A lassovar object.
+#' @param ... use short=TRUE for a shorter printout.
+#' @method summary lassovar 
+#' @export
+summary.lassovar <- function(object,...){
 	if(!(class(object)=='lassovar'))stop('Object is not of the lassovar class')
 
 	argList	<- list(...)
-	ic	<-argList$ic
 	short	<-argList$short
-
-	if(is.null(ic))ic<-'BIC'
 	if(is.null(short))short<-FALSE
-	
-	ic.mod	<-object[[ic]]
 	
 	
 	cat('Call:\n',sep='')
@@ -17,7 +17,7 @@ summary.lassovar<-function(object,...)
 	cat('\n')
 
 	cat('Model estimated equation by equation','\n',sep='')
-	cat('Selection criterion: ',ic,'\n',sep='')				
+	cat('Selection criterion: ',object$ic,'\n',sep='')				
 	cat('Estimator: ',object$estimator,'\n',sep='')
 	if(!is.null(object$ada.w)){cat('Adaptive weights Estimator: ',object$ada.w$ada,'\n',sep='')}
 
@@ -25,11 +25,11 @@ summary.lassovar<-function(object,...)
 	T	<-nrow(object$y)
 	N	<-ncol(object$y)
 	cat('Dimensions: T = ',T,'  N = ',N,'\n',sep='')
-	nbr.nz	<-sum(colSums(ic.mod$coefficients[-1,]!=0))
+	nbr.nz	<-sum(colSums(object$coefficients[-1,]!=0))
 	if(object$estimator!='ols')
 		{
-		cat('\nTotal number of variables selected:',nbr.nz,' (',100*nbr.nz/length(ic.mod$coef[-1,]),'% of candidates)\n',sep='')
-		eq.sum	<-cbind(ic.mod$lambda,colSums(ic.mod$coefficients[-1,]!=0),ic.mod$rss/T)
+		cat('\nTotal number of variables selected:',nbr.nz,' (',100*nbr.nz/length(object$coef[-1,]),'% of candidates)\n',sep='')
+		eq.sum	<-cbind(matrix(object$lambda,ncol=1),colSums(object$coefficients[-1,]!=0),matrix(object$RSS/T,ncol=1))
 
 		rownames(eq.sum)<-object$var.names
 		colnames(eq.sum)<-c('Lambda','non-zero','resid var')

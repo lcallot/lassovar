@@ -1,21 +1,21 @@
 Package: lassovar
 Type: Package
-Title: Estimate Vector Autoregression using Lasso-type estimators
-Version: 0.5
-Date: 2015-03-11
+Title: Estimation and forecasting with VAR models using the (adaptive) Lasso.
+Description: Estimate Vector Autoregression using Lasso-type estimators
+Version: 0.9
+Date: 2015-6-16
 Author: Laurent Callot
 License: MIT + file LICENSE
 Maintainer: Laurent Callot <l.callot@gmail.com>
 URL: https://github.com/lcallot/lassovar
 LazyLoad: yes
-Depends:
+Depends: 
     R (>= 3.0.0)
-Imports:
+Imports: 
     parallel,
     glmnet,
     grpreg,
     Matrix,
     plyr,
     biglm
-Description: Estimate Vector Autoregression using Lasso-type estimators
-License: GPL (>= 2)
+Suggests: testthat

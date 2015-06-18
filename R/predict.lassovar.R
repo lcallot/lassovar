@@ -2,7 +2,9 @@
 #'
 #' @param object A lassovar object.
 #' @param fc.data A data frame with the new data.
+#' @param ... unused
 #'
+#' @method predict lassovar 
 #' @export
 predict.lassovar <-
 function(object,fc.data,...)
