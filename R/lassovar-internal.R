@@ -6,15 +6,15 @@
 
 # The workhorse, fits a lasso possibly adaptive given weights ada.w and selects the best model according both information criteria. 
 .lassovar.eq <-
-function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,alpha=1,dfmax)
+function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,alpha=1,dfmax,trend)
 {
-	lasso.eq	<-list('call'=match.call(),'var.names'=colnames(y),'ada.w'=ada.w,'x'=x,'y'=y,'coefficients'=NULL,'RSS'=NULL,'lambda'=NULL,'spectest'=NULL)	
+	lasso.eq	<-list('call'=match.call(),'var.names'=colnames(y),'ada.w'=ada.w,'x'=x,'y'=y,'coefficients'=NULL,'RSS'=NULL,'lambda'=NULL,'spectest'=NULL,'trend'=trend)	
 	all.ic		<-list()
 
 	
 	#Estimation with and w/o multicore
-	if(!mc){for(i in 1:ncol(y)){ all.ic[[i]]	<-.lv.eq.gn(i,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax)}}
-	if(mc){	all.ic<-mclapply(1:ncol(y),.lv.eq.gn,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,mc.cores=ncores)}
+	if(!mc){for(i in 1:ncol(y)){ all.ic[[i]]	<-.lv.eq.gn(i,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,trend)}}
+	if(mc){	all.ic<-mclapply(1:ncol(y),.lv.eq.gn,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,trend,mc.cores=ncores)}
 
 
 	#Sorting out the IC results
@@ -39,7 +39,7 @@ return(lasso.eq)
 
 
 # Core function. Estimation of the Lasso and model selection.
-.lv.eq.gn<-function(i,y,x,ada.w,ic,alpha,dfmax)
+.lv.eq.gn<-function(i,y,x,ada.w,ic,alpha,dfmax,trend)
 {
 
 	
@@ -48,16 +48,23 @@ return(lasso.eq)
 	
   # Plain lasso
 	if(is.null(ada.w)){
-		gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=all.excl,alpha=alpha,dfmax=dfmax,standardize=TRUE,type.gaussian='covariance')}
+		wpen <- rep(1,ncol(x))
+		if(trend)wpen[ncol(x)] <- 0 # no penalty for the trend
+		gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=all.excl,penalty.factor=wpen,alpha=alpha,dfmax=dfmax,standardize=TRUE,type.gaussian='covariance')}
 	
 	# In case of adaptive lasso
 	if(!is.null(ada.w)){
-		if(sum(ada.w$w[,i]==Inf)==length(ada.w$w[,i])){gn.mod<-NULL}
+		# in case all the adaptive weights are equal to zero (empty model) 
+		if(sum(ada.w$w[,i]==Inf)==length(ada.w$w[,i])){
+			gn.mod<-NULL
+			warning('Adaptive weights all equal to Inf, all candidated excluded in the first step. Adaptive Lasso not estimated.')
+		}
 		else{
-			wzero		<-ada.w$w[,i]
-			wzero[which(wzero==Inf)]<-0
-			#cat(c(cov.excl,which(ada.w$w[,i]==Inf)),'\n')
-			gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=c(all.excl,which(ada.w$w[,i]==Inf)),penalty.factor=wzero,alpha=alpha,dfmax=dfmax,standardize=FALSE,type.gaussian='covariance')}
+			wpen		<-ada.w$w[,i]
+			wpen[which(wpen==Inf)]<-0 # variables with Inf weights are manually removed. 
+			if(trend)wpen[ncol(x)] <- 0 # no penalty for the trend
+			
+			gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=c(all.excl,which(ada.w$w[,i]==Inf)),penalty.factor=wpen,alpha=alpha,dfmax=dfmax,standardize=FALSE,type.gaussian='covariance')}
 	}
   
 	if(!is.null(gn.mod)){lv.ic		<-.ic.modsel(gn.mod,yi=y[,i],x=x,ic=ic,alpha=alpha)}
@@ -108,7 +115,7 @@ return(lasso.ic)
 
 
 .mkvar <-
-	function(data.var,lags,horizon,exo=NULL)
+	function(data.var,lags,horizon,exo=NULL,trend)
 	{
 		nbrser	<-ncol(data.var)
 		
@@ -126,18 +133,28 @@ return(lasso.ic)
 					  	  as.matrix(head(data.var,-(l+horizon-1)))))
 			varnx <- c(varnx,paste(l,'L_',varny,sep=''))
 		}
-		colnames(x) <- varnx
 		
 		# Exo variables
-		#if(!is.null(exo)){	x<-cbind(x,t(aaply(exo,2,lag,k=1)))}
-		if(!is.null(exo)){	x<-cbind(x,as.matrix(exo))}
+		if(!is.null(exo)){
+			if(is.null(colnames(exo))) vnexo <-paste0('Exo_',1:ncol(x))
+		    if(!is.null(colnames(exo)))vnexo <-colnames(exo)
+			varnx <- c(varnx,vnexo)
+			x<-cbind(x,as.matrix(exo))
+		}
 		
 		
 		# Trimming  and x
 		y <- tail(y,-(lags+horizon-1))
 		x <- tail(x,-(lags+horizon-1))
 		
-		y.var<-list('y'=y,'x'=x,'lags'=lags,'horizon'=horizon,'nbrser'=nbrser)
+		# trend
+		if(trend){
+			x<-cbind(x,1:nrow(x))
+		colnames(x) <- c(varnx,'trend')
+		}
+		if(!trend) colnames(x) <- varnx
+		
+		y.var<-list('y'=y,'x'=x,'lags'=lags,'horizon'=horizon,'nbrser'=nbrser,'trend'=trend)
 		return(y.var)
 	}
 
@@ -149,12 +166,14 @@ return(lasso.ic)
 	sptest <- list()
 	
 
-	BP <- Box.test(mres,lag=lags,type="L",fitdf=floor(fitdf))$p.val
+	BP <- Box.test(mres,lag=lags,type="Ljung-Box",fitdf=floor(fitdf))$p.val
 	SW <- shapiro.test(mres)$p.value
 	R2 <- 1-((length(mres)*var(mres,na.rm=TRUE))/(var(yi)*length(yi)))
 
 	sptest <- c(BP,SW,R2)
-
+	names(sptest) <- c('Ljung-Box','Shapiro','R2')		
+	
+	
 	return(sptest)
 	}
 

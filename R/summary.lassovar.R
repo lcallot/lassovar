@@ -20,20 +20,25 @@ summary.lassovar <- function(object,...){
 	cat('Selection criterion: ',object$ic,'\n',sep='')				
 	cat('Estimator: ',object$estimator,'\n',sep='')
 	if(!is.null(object$ada.w)){cat('Adaptive weights Estimator: ',object$ada.w$ada,'\n',sep='')}
-
+	cat('Deterministics: ',ifelse(object$trend,'interept and trend','intercept'),'.\n',sep='')
 
 	T	<-nrow(object$y)
 	N	<-ncol(object$y)
 	cat('Dimensions: T = ',T,'  N = ',N,'\n',sep='')
-	nbr.nz	<-sum(colSums(object$coefficients[-1,]!=0))
+	
+	
+	if(!object$trend)nzeq	<-colSums(object$coefficients[-1,]!=0)
+	if(object$trend)nzeq	<-colSums(object$coefficients[2:(nrow(object$coefficients)-1),]!=0)
+	nbr.nz <- sum(nzeq)
+	
 	if(object$estimator!='ols')
 		{
 		cat('\nTotal number of variables selected:',nbr.nz,' (',100*nbr.nz/length(object$coef[-1,]),'% of candidates)\n',sep='')
-		eq.sum	<-cbind(matrix(object$lambda,ncol=1),colSums(object$coefficients[-1,]!=0),matrix(object$RSS/T,ncol=1))
+		eq.sum	<-cbind(matrix(object$lambda,ncol=1),nzeq,matrix(object$RSS/T,ncol=1))
 
 		rownames(eq.sum)<-object$var.names
 		colnames(eq.sum)<-c('Lambda','non-zero','resid var')
-		if(!short){print('Model summary statistics:');print(eq.sum);}
+		if(!short){cat('\n Model summary statistics:\n');print(eq.sum);cat('\nDeterministics not included in the non-zero count.\n')}
 		if(short){cat('Summary statistics','\n','Average for all equations:','\n',sep='');print(colMeans(eq.sum));}
 		}
 

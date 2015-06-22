@@ -11,12 +11,13 @@
 #' @param fc.type Should the forecasts be recursive or direct?
 #' @param ic Information criterion used to select the penalty parameter: BIC or AIC.
 #' @param mc Parallelize the forecasts with the multicore package. If you want to parallelize the equation-by-equation esitmation of the lasso var, set mc=FALSE and mclas=TRUE. In both cases, use the optional parameter ncores to select the numbers of cores to use.
+#' @param silent Should output be printed?
 #' @param ... Optional options...
 #'
 #'
 #' @return A list.
 #' @export
-forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),fc.type=c('recursive','direct'),ic=c('BIC','AIC'),mc=FALSE,... )
+forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),fc.type=c('recursive','direct'),ic=c('BIC','AIC'),mc=FALSE,silent=FALSE,trend=FALSE,... )
 {
 	# Matching a few args
 	ic <- match.arg(ic)	
@@ -41,23 +42,24 @@ forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),
 
 # Multicore?
 	if(mc) if(is.null(ncores)){ncores=1}
-	cat('ncores:',ncores)
 
 # Number of forecasts
 	nbr.fc	<-nrow(dat)-ntrain
 
 # Some output 
+if(!silent){
 	cat('\n		-----------------------------		\n')	
 	cat('Lassovar forecast\n')
 	cat('Estimator: ',ifelse(is.null(argList$adaptive),'Lasso','Adaptive Lasso'),'\n',sep='')
 	if(!is.null(argList$adaptive))cat('Initial Estimator: ',argList$adaptive,'\n',sep='')
 	cat('Number of equations: ',ncol(dat),'\n',sep='')
+	if(mc)cat('Number of cores used:',ncores)
 	cat(fc.window,' window forecasts\n',sep='')
 	cat(horizon,'-steps ahead ',fc.type,' forecasts. Initial training sample: ',ntrain,' observations.\n','Number of forecasts: ',nbr.fc,'\n',sep='')
 	if(mc) cat('Forecast level multicore enabled, #cores: ',ncores,'\n',sep='')
 	if(!is.null(argList$mclas))if(argList$mclas)cat('Equation level multicore enabled, #cores: ',ncores,'\n',sep='')
 	cat('\n		-----------------------------		\n')	
-
+}
 
 # Progress bar here?
 
@@ -65,13 +67,15 @@ forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),
                              ,dat,ntrain,fc.window,lags
                              ,horizon,ic,exo=exo
 							 ,adaptive=argList$adaptive
-                             ,post=post)
+                             ,post=post,silent=silent
+							 ,trend=trend)
 
 	if(mc)fc.lassovar<-mclapply(0:(nbr.fc-horizon),.fc.loop.lassovar
                               ,dat,ntrain,fc.window,lags
                               ,horizon,ic,mc.cores=ncores,exo=exo
 							  ,adaptive=argList$adaptive
-                              ,post=post)
+                              ,post=post,silent=silent
+							  ,trend=trend)
 	
 
 	fc.lv$coefficients<-list()

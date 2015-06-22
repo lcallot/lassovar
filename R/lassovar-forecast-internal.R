@@ -3,7 +3,7 @@
 # 
 # This function subsets the data into training sample and 'true' value of the forecast, calls the next.
 .fc.loop.lassovar <-
-function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,...)
+function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,silent,trend,...)
 {
 
 	# begining of the training sample
@@ -18,15 +18,15 @@ function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,...)
 	
 	# Estimation
 	fc.time		<-Sys.time()	
-	fc.err		<-.fc.lassovar(train.dat,fc.dat,lags,horizon,ic,exo,rest,post,adaptive,...)
+	fc.err		<-.fc.lassovar(train.dat,fc.dat,lags,horizon,ic,exo,rest,post,adaptive,trend,...)
 	
 	dif.time<-difftime(Sys.time(),fc.time,units='mins')
-	cat('fc ',fc,' completed in ',round(dif.time,2),' minutes.\n',sep='')
+	if(!silent) cat('fc ',fc,' completed in ',round(dif.time,2),' minutes.\n',sep='')
 	return(fc.err)
 }
 
 # This function estimates a lassovar, calls predict to get forecasts, computes the forecast errors and returns a list with forecast errors, predictions and diagnostics. 
-.fc.lassovar<-function(train.dat,fc.dat,lags,horizon,ic='BIC',exo,rest,post,adaptive,...)
+.fc.lassovar<-function(train.dat,fc.dat,lags,horizon,ic='BIC',exo,rest,post,adaptive,trend,...)
 {
 	
 	argList	<- list(...)
@@ -36,9 +36,9 @@ function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,...)
 	if(!is.null(argList$ncores))ncores <- ifelse(mclas,argList$ncores,1)
 	else ncores <- 1
 	
-	y.var		<-.mkvar(train.dat,lags,horizon,exo)
+	y.var		<-.mkvar(train.dat,lags,horizon,exo,trend)
 	
-	las.mod		<-lassovar(dat=train.dat,horizon=horizon,lags=lags,ic=ic,exo=exo,mc=mclas,ncores=ncores,post=post,adaptive=adaptive)
+	las.mod		<-lassovar(dat=train.dat,horizon=horizon,lags=lags,ic=ic,exo=exo,mc=mclas,ncores=ncores,post=post,adaptive=adaptive,trend=trend)
 
 	lv		<-list()
 	

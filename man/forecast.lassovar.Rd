@@ -6,7 +6,7 @@
 \usage{
 forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
   "expanding"), fc.type = c("recursive", "direct"), ic = c("BIC", "AIC"),
-  mc = FALSE, ...)
+  mc = FALSE, silent = FALSE, ...)
 }
 \arguments{
 \item{dat}{A data.frame.}
@@ -22,6 +22,8 @@ forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
 \item{ic}{Information criterion used to select the penalty parameter: BIC or AIC.}
 
 \item{mc}{Parallelize the forecasts with the multicore package. If you want to parallelize the equation-by-equation esitmation of the lasso var, set mc=FALSE and mclas=TRUE. In both cases, use the optional parameter ncores to select the numbers of cores to use.}
+
+\item{silent}{Should output be printed?}
 
 \item{...}{Optional options...}
 }
