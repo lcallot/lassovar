@@ -1,5 +1,7 @@
 #' Multiple forecasts a VAR using the Lasso or adaptive lasso.
 #'
+#'
+#' @description This function is designed to compute pseudo out-of-sample forecasting experiments. For out-of-sample forecasts use the predict method. The function will produce h-step ahead forecasts either directly, by fitting a h-step ahead VAR, or recursively. The model is trained on ntrain observations, and as many h-step ahead forecasts as possible are computed on the remainder of the sample.   
 #' @importFrom parallel mclapply
 #'
 #' @param dat A data.frame.
@@ -11,6 +13,8 @@
 #' @param mc Parallelize the forecasts with the multicore package. If you want to parallelize the equation-by-equation esitmation of the lasso var, set mc=FALSE and mclas=TRUE. In both cases, use the optional parameter ncores to select the numbers of cores to use.
 #' @param ... Optional options...
 #'
+#'
+#' @return A list.
 #' @export
 forecast.lassovar<-function(dat,ntrain,horizon=1,fc.window=c('fix','expanding'),fc.type=c('recursive','direct'),ic=c('BIC','AIC'),mc=FALSE,... )
 {

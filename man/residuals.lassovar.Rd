@@ -2,6 +2,7 @@
 % Please edit documentation in R/residuals.lassovar.R
 \name{residuals.lassovar}
 \alias{resid}
+\alias{residuals}
 \alias{residuals.lassovar}
 \title{The residuals method of class lassovar.}
 \usage{

@@ -25,7 +25,10 @@ forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
 
 \item{...}{Optional options...}
 }
+\value{
+A list.
+}
 \description{
-Multiple forecasts a VAR using the Lasso or adaptive lasso.
+This function is designed to compute pseudo out-of-sample forecasting experiments. For out-of-sample forecasts use the predict method. The function will produce h-step ahead forecasts either directly, by fitting a h-step ahead VAR, or recursively. The model is trained on ntrain observations, and as many h-step ahead forecasts as possible are computed on the remainder of the sample.
 }
 

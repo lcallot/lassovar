@@ -2,11 +2,11 @@
 % Please edit documentation in R/lassovar.R
 \name{lassovar}
 \alias{lassovar}
-\title{Estimates a Vector Autoregressive model by mean of Lasso or adaptive Lasso}
+\title{Fits a Vector Autoregressive model by l1 penalization.}
 \usage{
 lassovar(dat, exo = NULL, lags = 1, ic = c("BIC", "AIC"),
   adaptive = c("none", "ols", "lasso", "group", "ridge"), post = FALSE,
-  mc = FALSE, ncores = NULL, dfmax = NULL, ...)
+  mc = FALSE, ncores = NULL, dfmax = NULL, horizon = 1)
 }
 \arguments{
 \item{dat}{a data.frame containing the series.}
@@ -27,19 +27,33 @@ lassovar(dat, exo = NULL, lags = 1, ic = c("BIC", "AIC"),
 
 \item{dfmax}{Optional, the maximum number of variables in the model excluding the intercept. An option of glmnet, it exits the algorithm when the penalty is small enough that more than dmax variables are included in the model. Incresease the speed tremendously for large VARs.}
 
-\item{...}{Optional options...}
+\item{horizon}{Estimate a h-step ahead VAR, useful for direct forecasting. Default = 1.}
 }
 \value{
-A lassovar object.
+A list with S3 class \pkg{lassovar}.
+\describe{
+	\item{call}{The call. }
+	\item{var.names}{ A vector with the names of the endogenous variables. }
+	\item{ada.w}{ A list containing the initial estimator in case of an adaptive Lasso, NULL otherwise.  }
+	\item{x}{ A data.frame containing the right hand side variables. }
+	\item{y}{ A data.frame containing the left hand side variables. }
+	\item{coefficients}{  The parameters of the VAR. }
+	\item{RSS}{ The residual sum of squares.  }
+	\item{Lambda}{ A vector with the penalty parameter selected for each equation. }
+	\item{spectes}{ A matrix containing the results of specification tests (TO BE COMPLETED & ADD SPECTESTS TO SUMMARY). }
+	\item{estimator}{ A string containing the name of the estimator (lasso or adaptive lasso). }
+	\item{ic}{ A string with the name of the information criterion used to select the penlaty parameters. }
+	\item{nbreq}{ The number of equations. }
+}
 }
 \description{
-Estimates a Vector Autoregressive model by mean of Lasso or adaptive Lasso
+Fits a Vector Autoregressive model by mean of Lasso or adaptive Lasso. The parameters are estimated using \pkg{glmnet}, the penalty parameter is selected using information criteria. The VAR is constructed from the \code{data.frame} provided, exogenous variables and various deterministic specifications are possible in options.
 }
 \examples{
 \dontrun{
 dat <- data.frame(matrix(rnorm(100),ncol=5))
 lv.mod <- lassovar(dat,lags=1)
-lv.mod.ada <- lassovar(dat,lags=1,adaptive ='ols')
+lv.mod.ada <- lassovar(dat,lags=2,adaptive ='ols')
 }
 }
 
