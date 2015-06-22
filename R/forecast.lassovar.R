@@ -12,6 +12,7 @@
 #' @param ic Information criterion used to select the penalty parameter: BIC or AIC.
 #' @param mc Parallelize the forecasts with the multicore package. If you want to parallelize the equation-by-equation esitmation of the lasso var, set mc=FALSE and mclas=TRUE. In both cases, use the optional parameter ncores to select the numbers of cores to use.
 #' @param silent Should output be printed?
+#' @param trend Should a linear trend be included in the model. 
 #' @param ... Optional options...
 #'
 #'

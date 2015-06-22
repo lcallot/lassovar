@@ -28,7 +28,8 @@ function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,alpha=1,dfmax,trend)
 	rm('all.ic')
 	gc()
 
-
+	colnames(lasso.eq$spectest) <- colnames(y)
+	
 	if(is.null(ada.w))lasso.eq$estimator	<-'Lasso'
 	if(!is.null(ada.w)){lasso.eq$estimator	<-'Adaptive Lasso'}
 

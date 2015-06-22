@@ -6,7 +6,7 @@
 # Group lasso adaptive weights
 # Mostly Deprecated
 .ada.grp.weights <-
-function(y,x,ada)
+function(y,x,ada,trend)
 {
 	nbr.lags	<-ncol(x)/ncol(y)
 	grp.ind		<-sort(rep(1:nbr.lags,ncol(y)))

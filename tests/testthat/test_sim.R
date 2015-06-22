@@ -4,7 +4,7 @@ library(lassovar)
 A <- matrix(0,3,3)
 diag(A) <- 0.4
 A[2,1] <- A[1,3] <- -0.4
-# Simulating data
+# Simulating data (VAR(1))
 nobs <- 20
 simdata <- matrix(rnorm(3),nobs+1,3)
 simdata[1,] <- rnorm(3)

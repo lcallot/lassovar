@@ -6,7 +6,7 @@
 \usage{
 forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
   "expanding"), fc.type = c("recursive", "direct"), ic = c("BIC", "AIC"),
-  mc = FALSE, silent = FALSE, ...)
+  mc = FALSE, silent = FALSE, trend = FALSE, ...)
 }
 \arguments{
 \item{dat}{A data.frame.}
