@@ -15,7 +15,7 @@ colnames(simdata) <- c('Cyrus','Cambyses','Darius')
 
 # TEST METHODS
 # Estimating a model
-mod <- lassovar(simdata,lags = 1,trend=TRUE)
+mod <- lassovar(simdata,lags = 1,exo=data.frame('exovar'=1:500))
 # testing summary
 expect_that(summary(mod),is_a('matrix'))
 # some fake data for forecasting

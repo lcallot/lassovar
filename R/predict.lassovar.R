@@ -9,8 +9,16 @@
 predict.lassovar <-
 function(object,fc.data,...)
 {
-	fc.fit	<-cbind(1,fc.data)%*%coef(object)
-	names(fc.fit)<-object$var.names
 	
+	dd <- dim(as.matrix(fc.data))
+
+	if(1%in%dd){
+		fc.fit	<-cbind(1,matrix(fc.data,nrow=1))%*%coef(object)
+		#names(fc.fit)<-object$var.names
+	}	
+	if(!(1%in%dd)){
+		fc.fit	<-cbind(1,fc.data)%*%coef(object)
+	}
+		colnames(fc.fit)<-object$var.names
 	return(fc.fit)
 }
