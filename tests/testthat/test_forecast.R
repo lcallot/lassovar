@@ -17,11 +17,13 @@ colnames(simdata) <- c('Cyrus','Cambyses','Darius')
 # TEST FORECASTS
 
 # basic
-expect_that(forecast.lassovar(dat = simdata,ntrain = 48,horizon = 1,fc.window = 'fix',fc.type = 'recursive'),is_a('list'))
+expect_that(forecast.lassovar(dat = simdata,fc.train = 48,horizon = 1,fc.window = 'fix',fc.type = 'recursive'),is_a('list'))
+# exo
+expect_that(forecast.lassovar(dat = simdata,exo = matrix(rnorm(nobs),ncol=1),fc.train = 48,horizon = 1,fc.window = 'fix',fc.type = 'recursive'),is_a('list'))
 # expanding
-expect_that(forecast.lassovar(dat = simdata,ntrain = 48,horizon = 1,fc.window = 'expanding',fc.type = 'recursive',silent = TRUE),is_a('list'))
+expect_that(forecast.lassovar(dat = simdata,fc.train = 48,horizon = 1,fc.window = 'expanding',fc.type = 'recursive',silent = TRUE),is_a('list'))
 # horizon > 1 
-expect_that(forecast.lassovar(dat = simdata,ntrain = 47,horizon = 2,fc.window = 'fix',fc.type = 'recursive',silent = TRUE),is_a('list'))
+expect_that(forecast.lassovar(dat = simdata,fc.train = 47,horizon = 2,fc.window = 'fix',fc.type = 'recursive',silent = TRUE),is_a('list'))
 # direct forecasts
-expect_that(forecast.lassovar(dat = simdata,ntrain = 47,horizon = 2,fc.window = 'fix',fc.type = 'direct',silent = TRUE),is_a('list'))
+expect_that(forecast.lassovar(dat = simdata,fc.train = 47,horizon = 2,fc.window = 'fix',fc.type = 'direct',silent = TRUE),is_a('list'))
 

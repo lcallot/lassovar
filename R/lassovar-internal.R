@@ -137,7 +137,7 @@ return(lasso.ic)
 		
 		# Exo variables
 		if(!is.null(exo)){
-			if(is.null(colnames(exo))) vnexo <-paste0('Exo_',1:ncol(x))
+			if(is.null(colnames(exo))) vnexo <-paste0('Exo_',1:ncol(exo))
 		    if(!is.null(colnames(exo)))vnexo <-colnames(exo)
 			varnx <- c(varnx,vnexo)
 			x<-cbind(x,as.matrix(exo))

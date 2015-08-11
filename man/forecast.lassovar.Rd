@@ -4,16 +4,22 @@
 \alias{forecast.lassovar}
 \title{Multiple forecasts a VAR using the Lasso or adaptive lasso.}
 \usage{
-forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
-  "expanding"), fc.type = c("recursive", "direct"), ic = c("BIC", "AIC"),
-  mc = FALSE, silent = FALSE, trend = FALSE, ...)
+forecast.lassovar(dat, exo = NULL, fc.train, horizon = 1, lags = 1,
+  fc.window = c("fix", "expanding"), fc.type = c("recursive", "direct"),
+  ic = c("BIC", "AIC"), adaptive = c("none", "ols", "lasso", "group",
+  "ridge"), mc = FALSE, silent = FALSE, trend = FALSE, post = FALSE,
+  ncores = NULL, ...)
 }
 \arguments{
 \item{dat}{A data.frame.}
 
-\item{ntrain}{The number of training observations to use.}
+\item{exo}{Optional, a data frame of same length as dat containing exogenous variables. The exogenous variables are not lagged.}
+
+\item{fc.train}{The number of training observations to use.}
 
 \item{horizon}{The forecast horizon, default to 1.}
+
+\item{lags}{the number of consecutive lags in the model.}
 
 \item{fc.window}{Should the number of training observations be fixed or expanding when the sample increases?}
 
@@ -21,9 +27,17 @@ forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
 
 \item{ic}{Information criterion used to select the penalty parameter: BIC or AIC.}
 
+\item{adaptive}{Optional, initial estimator for the adaptive Lasso. Can be chosen between: none (default, plain Lasso), ols, lasso, ridge.}
+
 \item{mc}{Parallelize the forecasts with the multicore package. If you want to parallelize the equation-by-equation esitmation of the lasso var, set mc=FALSE and mclas=TRUE. In both cases, use the optional parameter ncores to select the numbers of cores to use.}
 
 \item{silent}{Should output be printed?}
+
+\item{trend}{Should a linear trend be included in the model.}
+
+\item{post}{Optional, Should a post Lasso OLS be estimated, default FALSE.}
+
+\item{ncores}{Optional, the number of cores to use in case of parallelization.}
 
 \item{...}{Optional options...}
 }
@@ -31,6 +45,6 @@ forecast.lassovar(dat, ntrain, horizon = 1, fc.window = c("fix",
 A list.
 }
 \description{
-This function is designed to compute pseudo out-of-sample forecasting experiments. For out-of-sample forecasts use the predict method. The function will produce h-step ahead forecasts either directly, by fitting a h-step ahead VAR, or recursively. The model is trained on ntrain observations, and as many h-step ahead forecasts as possible are computed on the remainder of the sample.
+This function is designed to compute pseudo out-of-sample forecasting experiments. For out-of-sample forecasts use the predict method. The function will produce h-step ahead forecasts either directly, by fitting a h-step ahead VAR, or recursively. The model is trained on fc.train observations, and as many h-step ahead forecasts as possible are computed on the remainder of the sample.
 }
 

@@ -3,22 +3,24 @@
 # 
 # This function subsets the data into training sample and 'true' value of the forecast, calls the next.
 .fc.loop.lassovar <-
-function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,silent,trend,...)
+function(fc,dat,fc.train,fc.window,lags,horizon,ic,exo,rest,post,adaptive,silent,trend,...)
 {
 
 	# begining of the training sample
 	start.train	<- 1+ifelse(fc.window=='fix',fc,0)
 	# end of the training sample.
-	end.train	<- start.train + ntrain - 1 + ifelse(fc.window=='expanding',fc,0)
+	end.train	<- start.train + fc.train - 1 + ifelse(fc.window=='expanding',fc,0)
 	
 	# The training data
 	train.dat <- dat[start.train:end.train,]
-	# The 'true' forecast data 
-	fc.dat		<-dat[end.train + 1,]
+	if(!is.null(exo))train.exo <- as.matrix(exo[start.train:end.train,])
+	else train.exo <-NULL
 	
+	# The 'true' forecast data 
+	fc.dat		<-dat[end.train + 1,]	
 	# Estimation
 	fc.time		<-Sys.time()	
-	fc.err		<-.fc.lassovar(train.dat,fc.dat,lags,horizon,ic,exo,rest,post,adaptive,trend,...)
+	fc.err		<-.fc.lassovar(train.dat,fc.dat,lags,horizon,ic,train.exo,rest,post,adaptive,trend,...)
 	
 	dif.time<-difftime(Sys.time(),fc.time,units='mins')
 	if(!silent) cat('fc ',fc,' completed in ',round(dif.time,2),' minutes.\n',sep='')
@@ -26,7 +28,7 @@ function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,silent,t
 }
 
 # This function estimates a lassovar, calls predict to get forecasts, computes the forecast errors and returns a list with forecast errors, predictions and diagnostics. 
-.fc.lassovar<-function(train.dat,fc.dat,lags,horizon,ic='BIC',exo,rest,post,adaptive,trend,...)
+.fc.lassovar<-function(train.dat,fc.dat,lags,horizon,ic='BIC',train.exo,rest,post,adaptive,trend,...)
 {
 	
 	argList	<- list(...)
@@ -36,9 +38,9 @@ function(fc,dat,ntrain,fc.window,lags,horizon,ic,exo,rest,post,adaptive,silent,t
 	if(!is.null(argList$ncores))ncores <- ifelse(mclas,argList$ncores,1)
 	else ncores <- 1
 	
-	y.var		<-.mkvar(train.dat,lags,horizon,exo,trend)
+	y.var		<-.mkvar(train.dat,lags,horizon,train.exo,trend)
 	
-	las.mod		<-lassovar(dat=train.dat,horizon=horizon,lags=lags,ic=ic,exo=exo,mc=mclas,ncores=ncores,post=post,adaptive=adaptive,trend=trend)
+	las.mod		<-lassovar(dat=train.dat,horizon=horizon,lags=lags,ic=ic,exo=train.exo,mc=mclas,ncores=ncores,post=post,adaptive=adaptive,trend=trend)
 
 	lv		<-list()
 	

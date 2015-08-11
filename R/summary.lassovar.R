@@ -27,8 +27,12 @@ summary.lassovar <- function(object,...){
 	cat('Dimensions: T = ',T,'  N = ',N,'\n',sep='')
 	
 	
-	if(!object$trend)nzeq	<-colSums(object$coefficients[-1,]!=0)
-	if(object$trend)nzeq	<-colSums(object$coefficients[2:(nrow(object$coefficients)-1),]!=0)
+	if(ncol(object$coefficients)==1) fsums <- sum
+	if(ncol(object$coefficients)>1) fsums <- colSums
+	
+	
+	if(!object$trend)nzeq	<-fsums(object$coefficients[-1,]!=0)
+	if(object$trend)nzeq	<-fsums(object$coefficients[2:(nrow(object$coefficients)-1),]!=0)
 	nbr.nz <- sum(nzeq)
 	
 	if(object$estimator!='ols')
