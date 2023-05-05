@@ -64,7 +64,7 @@ lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols'
 	# maxdegrees of freedom ?	
 	if(!is.null(dfmax))dfmax<-as.integer(dfmax)	else dfmax	<-ncol(dat)*lags
 
-	y.var	<-.mkvar(dat,lags=lags,horizon=1,exo=exo,trend=trend)	
+	y.var	<-.mkvar(dat,lags=lags,horizon=horizon,exo=exo,trend=trend)	
 	
 	if(adaptive!='none'){
 		cat('initial estimator for the adapive lasso: ',adaptive,'\n',sep='')
