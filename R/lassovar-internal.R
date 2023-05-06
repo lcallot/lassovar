@@ -171,7 +171,7 @@ return(lasso.ic)
 	SW <- try(shapiro.test(mres)$p.value, silent = TRUE) # handles the case of supplying a sample size larger than 5,000 (otherwise error message from shapiro.test() function)
 	R2 <- 1-((length(mres)*var(mres,na.rm=TRUE))/(var(yi)*length(yi)))
 
-	if(SW) {
+	if(is.numeric(SW)==T) {
 		sptest <- c(BP,SW,R2)
 		names(sptest) <- c('Ljung-Box','Shapiro','R2')		
 	} else {
