@@ -176,7 +176,7 @@ return(lasso.ic)
 		names(sptest) <- c('Ljung-Box','Shapiro','R2')		
 	} else {
 		sptest <- c(BP,R2)
-		names(sptest) <- c('Ljung-Box,'R2')
+		names(sptest) <- c('Ljung-Box','R2')
 	}
 	
 	return(sptest)
