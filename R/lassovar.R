@@ -14,6 +14,7 @@
 #' @param post Optional, Should a post Lasso OLS be estimated, default FALSE.
 #' @param horizon Estimate a h-step ahead VAR, useful for direct forecasting. Default = 1.
 #' @param trend Should a linear trend be included in the model. 
+#' @param lambda Running a penalized VAR model. Setting = 0 leads to a regular VAR estimation.
 #'
 #' @return 
 #' A list with S3 class \pkg{lassovar}.
