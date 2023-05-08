@@ -40,7 +40,7 @@
 #' }
 #'
 #' @export
-lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols','lasso','group','ridge'),post=FALSE,mc=FALSE,ncores=NULL,dfmax=NULL,horizon=1,trend=FALSE)
+lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols','lasso','group','ridge'),post=FALSE,mc=FALSE,ncores=NULL,dfmax=NULL,horizon=1,trend=FALSE,lambda=NULL)
 {
 	
 	# matching the multiple choice arguments. 
@@ -78,7 +78,7 @@ lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols'
 	else ada.w<-NULL
 	
 	#cat('Estimating the Final Lasso: ','\n',sep='')
-	las.mod<-.lassovar.eq(y.var$y,y.var$x,ada.w,ic=ic,mc=mc,ncores=ncores,dfmax=dfmax,trend=trend)
+	las.mod<-.lassovar.eq(y.var$y,y.var$x,ada.w,ic=ic,mc=mc,ncores=ncores,dfmax=dfmax,trend=trend,lambda=lambda)
 
 
 	if(post){	las.mod$post <- .post.ols(y.var$y,y.var$x,sel.pars=las.mod$coefficients!=0,mc=mc,ncores=ncores)}		
