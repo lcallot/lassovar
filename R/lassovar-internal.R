@@ -6,15 +6,15 @@
 
 # The workhorse, fits a lasso possibly adaptive given weights ada.w and selects the best model according both information criteria. 
 .lassovar.eq <-
-function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,alpha=1,dfmax,trend)
+function(y,x,ada.w,degf.type=NULL,ic,mc=FALSE,ncores=1,alpha=1,dfmax,trend,lambda=NULL)
 {
 	lasso.eq	<-list('call'=match.call(),'var.names'=colnames(y),'ada.w'=ada.w,'x'=x,'y'=y,'coefficients'=NULL,'RSS'=NULL,'lambda'=NULL,'spectest'=NULL,'trend'=trend)	
 	all.ic		<-list()
 
 	
 	#Estimation with and w/o multicore
-	if(!mc){for(i in 1:ncol(y)){ all.ic[[i]]	<-.lv.eq.gn(i,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,trend)}}
-	if(mc){	all.ic<-mclapply(1:ncol(y),.lv.eq.gn,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,trend,mc.cores=ncores)}
+	if(!mc){for(i in 1:ncol(y)){ all.ic[[i]]	<-.lv.eq.gn(i,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,trend,lambda=lambda)}}
+	if(mc){	all.ic<-mclapply(1:ncol(y),.lv.eq.gn,y,x,ada.w,ic=ic,alpha=alpha,dfmax=dfmax,trend,mc.cores=ncores,lambda=lambda)}
 
 
 	#Sorting out the IC results
@@ -40,9 +40,8 @@ return(lasso.eq)
 
 
 # Core function. Estimation of the Lasso and model selection.
-.lv.eq.gn<-function(i,y,x,ada.w,ic,alpha,dfmax,trend)
+.lv.eq.gn<-function(i,y,x,ada.w,ic,alpha,dfmax,trend,lambda = NULL)
 {
-
 	
 # Computing exclusion vectors.	
 	all.excl<-NULL
@@ -51,7 +50,7 @@ return(lasso.eq)
 	if(is.null(ada.w)){
 		wpen <- rep(1,ncol(x))
 		if(trend)wpen[ncol(x)] <- 0 # no penalty for the trend
-		gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=all.excl,penalty.factor=wpen,alpha=alpha,dfmax=dfmax,standardize=TRUE,type.gaussian='covariance')}
+		gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=all.excl,penalty.factor=wpen,alpha=alpha,dfmax=dfmax,standardize=TRUE,type.gaussian='covariance',lambda=lambda)}
 	
 	# In case of adaptive lasso
 	if(!is.null(ada.w)){
@@ -65,7 +64,7 @@ return(lasso.eq)
 			wpen[which(wpen==Inf)]<-0 # variables with Inf weights are manually removed. 
 			if(trend)wpen[ncol(x)] <- 0 # no penalty for the trend
 			
-			gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=c(all.excl,which(ada.w$w[,i]==Inf)),penalty.factor=wpen,alpha=alpha,dfmax=dfmax,standardize=FALSE,type.gaussian='covariance')}
+			gn.mod	<-glmnet(x=x,y=y[,i],family='gaussian',exclude=c(all.excl,which(ada.w$w[,i]==Inf)),penalty.factor=wpen,alpha=alpha,dfmax=dfmax,standardize=FALSE,type.gaussian='covariance',lambda=lambda)}
 	}
   
 	if(!is.null(gn.mod)){lv.ic		<-.ic.modsel(gn.mod,yi=y[,i],x=x,ic=ic,alpha=alpha)}
@@ -168,12 +167,16 @@ return(lasso.ic)
 	
 
 	BP <- Box.test(mres,lag=lags,type="Ljung-Box",fitdf=floor(fitdf))$p.val
-	SW <- shapiro.test(mres)$p.value
+	SW <- try(shapiro.test(mres)$p.value, silent = TRUE) # handles the case of supplying a sample size larger than 5,000 (otherwise error message from shapiro.test() function)
 	R2 <- 1-((length(mres)*var(mres,na.rm=TRUE))/(var(yi)*length(yi)))
 
-	sptest <- c(BP,SW,R2)
-	names(sptest) <- c('Ljung-Box','Shapiro','R2')		
-	
+	if(is.numeric(SW)==T) {
+		sptest <- c(BP,SW,R2)
+		names(sptest) <- c('Ljung-Box','Shapiro','R2')		
+	} else {
+		sptest <- c(BP,R2)
+		names(sptest) <- c('Ljung-Box','R2')
+	}
 	
 	return(sptest)
 	}

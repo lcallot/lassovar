@@ -14,6 +14,7 @@
 #' @param post Optional, Should a post Lasso OLS be estimated, default FALSE.
 #' @param horizon Estimate a h-step ahead VAR, useful for direct forecasting. Default = 1.
 #' @param trend Should a linear trend be included in the model. 
+#' @param lambda Passing user-defind lambda value(s). Setting = 0 leads to a regular VAR estimation.
 #'
 #' @return 
 #' A list with S3 class \pkg{lassovar}.
@@ -40,7 +41,7 @@
 #' }
 #'
 #' @export
-lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols','lasso','group','ridge'),post=FALSE,mc=FALSE,ncores=NULL,dfmax=NULL,horizon=1,trend=FALSE)
+lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols','lasso','group','ridge'),post=FALSE,mc=FALSE,ncores=NULL,dfmax=NULL,horizon=1,trend=FALSE,lambda=NULL)
 {
 	
 	# matching the multiple choice arguments. 
@@ -64,7 +65,7 @@ lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols'
 	# maxdegrees of freedom ?	
 	if(!is.null(dfmax))dfmax<-as.integer(dfmax)	else dfmax	<-ncol(dat)*lags
 
-	y.var	<-.mkvar(dat,lags=lags,horizon=1,exo=exo,trend=trend)	
+	y.var	<-.mkvar(dat,lags=lags,horizon=horizon,exo=exo,trend=trend)	
 	
 	if(adaptive!='none'){
 		cat('initial estimator for the adapive lasso: ',adaptive,'\n',sep='')
@@ -78,7 +79,7 @@ lassovar<-function(dat,exo=NULL,lags=1,ic=c('BIC','AIC'),adaptive=c('none','ols'
 	else ada.w<-NULL
 	
 	#cat('Estimating the Final Lasso: ','\n',sep='')
-	las.mod<-.lassovar.eq(y.var$y,y.var$x,ada.w,ic=ic,mc=mc,ncores=ncores,dfmax=dfmax,trend=trend)
+	las.mod<-.lassovar.eq(y.var$y,y.var$x,ada.w,ic=ic,mc=mc,ncores=ncores,dfmax=dfmax,trend=trend,lambda=lambda)
 
 
 	if(post){	las.mod$post <- .post.ols(y.var$y,y.var$x,sel.pars=las.mod$coefficients!=0,mc=mc,ncores=ncores)}		
