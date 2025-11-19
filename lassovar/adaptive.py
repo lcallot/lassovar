@@ -9,6 +9,9 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression, LassoCV, RidgeCV
 from joblib import Parallel, delayed
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def compute_ols_weights(y, x, mc=False, n_jobs=-1, gamma=1):
@@ -187,8 +190,8 @@ def compute_group_weights(y, x, trend=False, gamma=1):
     dict
         Dictionary with adaptive weights
     """
-    print("Group Lasso computation")
-    print("Note: Simplified implementation without group structure")
+    logger.info("Group Lasso computation")
+    logger.info("Note: Simplified implementation without group structure")
     
     # For now, use standard Lasso as approximation
     # A full implementation would require group Lasso optimization
@@ -198,7 +201,7 @@ def compute_group_weights(y, x, trend=False, gamma=1):
     greg_coef = []
     
     for i in range(n_eq):
-        print(f" Equation: {i} - ", end='')
+        logger.debug(f"Processing equation: {i}")
         yi = y.iloc[:, i].values
         
         # Use LassoCV as approximation
@@ -209,7 +212,7 @@ def compute_group_weights(y, x, trend=False, gamma=1):
         coef = np.concatenate([[model.intercept_], model.coef_])
         greg_coef.append(coef[1:])  # Exclude intercept for weights
     
-    print("Group lasso ---- done")
+    logger.info("Group lasso computation complete")
     
     greg_coef = np.column_stack(greg_coef)
     
@@ -255,7 +258,7 @@ def get_adaptive_weights(y, x, adaptive_type, ic='BIC', mc=False,
     if adaptive_type == 'none':
         return None
     
-    print(f'Initial estimator for the adaptive lasso: {adaptive_type}')
+    logger.info(f"Initial estimator for the adaptive lasso: {adaptive_type}")
     
     if adaptive_type == 'ols':
         return compute_ols_weights(y, x, mc=mc, n_jobs=n_jobs)

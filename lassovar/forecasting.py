@@ -8,6 +8,9 @@ experiments with Lasso VAR models.
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
+import logging
+
+logger = logging.getLogger(__name__)
 import time
 
 from .lassovar import LassoVAR
@@ -114,7 +117,7 @@ def forecast_loop_iteration(fc, dat, fc_train, fc_window, lags, horizon,
     
     elapsed = time.time() - fc_time
     if not silent:
-        print(f'fc {fc} completed in {elapsed/60:.2f} minutes.')
+        logger.info(f"Forecast {fc} completed in {elapsed/60:.2f} minutes")
     
     return result
 
@@ -220,10 +223,10 @@ def forecast_lassovar(dat, exo=None, fc_train=None, horizon=1, lags=1,
     
     # Print information
     if not silent:
-        print('\n\t-----------------------------\t')
-        print('Lassovar forecast')
+        
+        logger.info("Lassovar forecast")
         estimator_name = 'Adaptive Lasso' if adaptive != 'none' else 'Lasso'
-        print(f'Estimator: {estimator_name}')
+        logger.info(f"Estimator: {estimator_name}")
         if adaptive != 'none':
             print(f'Initial Estimator: {adaptive}')
         print(f'Number of equations: {dat.shape[1]}')
@@ -235,7 +238,7 @@ def forecast_lassovar(dat, exo=None, fc_train=None, horizon=1, lags=1,
         print(f'Number of forecasts: {nbr_fc}')
         if mc:
             print(f'Forecast level multicore enabled, #cores: {n_jobs if n_jobs > 0 else "all"}')
-        print('\n\t-----------------------------\t')
+        
     
     # For direct forecasting, adjust horizon in model estimation
     if fc_type == 'direct':

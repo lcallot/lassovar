@@ -13,9 +13,17 @@ from joblib import Parallel, delayed
 import warnings
 
 from .utils import (
+
+
+
     compute_bic, compute_aic, specification_tests,
     ridge_degrees_of_freedom
 )
+
+# Model fitting constants
+MAX_ITER = 10000
+TOLERANCE = 1e-4
+
 
 
 def fit_glmnet_equation(i, y, x, ada_w, ic, alpha, dfmax, trend, lambda_values):
@@ -116,8 +124,8 @@ def fit_glmnet_equation(i, y, x, ada_w, ic, alpha, dfmax, trend, lambda_values):
         if alpha == 1.0:
             # Lasso
             if ada_w is None:
-                model = Lasso(alpha=lam, fit_intercept=True, max_iter=10000, 
-                             tol=1e-4, warm_start=False)
+                model = Lasso(alpha=lam, fit_intercept=True, max_iter=MAX_ITER, 
+                             tol=TOLERANCE, warm_start=False)
             else:
                 # Adaptive Lasso: modify penalty
                 # sklearn doesn't support per-feature penalties directly,
@@ -127,8 +135,8 @@ def fit_glmnet_equation(i, y, x, ada_w, ic, alpha, dfmax, trend, lambda_values):
                     if j not in excluded_vars and penalty_weights[j] > 0:
                         x_weighted[:, j] = x_weighted[:, j] / penalty_weights[j]
                 
-                model = Lasso(alpha=lam, fit_intercept=True, max_iter=10000,
-                             tol=1e-4, warm_start=False)
+                model = Lasso(alpha=lam, fit_intercept=True, max_iter=MAX_ITER,
+                             tol=TOLERANCE, warm_start=False)
                 try:
                     model.fit(x_weighted, yi)
                     # Rescale coefficients
@@ -138,15 +146,16 @@ def fit_glmnet_equation(i, y, x, ada_w, ic, alpha, dfmax, trend, lambda_values):
                     intercepts_list.append(model.intercept_)
                     lambda_used.append(lam)
                     continue
-                except:
+                except (ValueError, RuntimeError) as e:
+                    # Skip lambda values that cause convergence issues
                     continue
         elif alpha == 0.0:
             # Ridge
-            model = Ridge(alpha=lam, fit_intercept=True, max_iter=10000, tol=1e-4)
+            model = Ridge(alpha=lam, fit_intercept=True, max_iter=MAX_ITER, tol=TOLERANCE)
         else:
             # Elastic Net
             model = ElasticNet(alpha=lam, l1_ratio=alpha, fit_intercept=True,
-                              max_iter=10000, tol=1e-4, warm_start=False)
+                              max_iter=MAX_ITER, tol=TOLERANCE, warm_start=False)
         
         try:
             if alpha != 1.0 or ada_w is None:
@@ -154,7 +163,8 @@ def fit_glmnet_equation(i, y, x, ada_w, ic, alpha, dfmax, trend, lambda_values):
                 coefficients_list.append(model.coef_)
                 intercepts_list.append(model.intercept_)
                 lambda_used.append(lam)
-        except:
+        except (ValueError, RuntimeError) as e:
+            # Skip lambda values that cause convergence issues
             continue
         
         # Check dfmax constraint
